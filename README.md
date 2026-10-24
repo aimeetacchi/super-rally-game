@@ -25,6 +25,8 @@ npm run dev -- --port 5186 --strictPort
 
 Then open [http://localhost:5186](http://localhost:5186).
 
+To play on a phone, connect it to the same Wi-Fi as your computer and open the **Network** URL printed by Vite (for example, `http://192.168.1.15:5186`). Use your computer’s actual address from the terminal; `localhost` on the phone refers to the phone itself. Keep the server running on your computer.
+
 The game runs in the browser. No backend, account, API keys, or environment variables are required.
 
 ## How to play
@@ -49,7 +51,7 @@ Your chosen car and best completed race time for each circuit are saved in your 
 | Pause or resume                  | **Escape**             |
 | Restart and return to the garage | **R**                  |
 
-Touch controls appear on small screens. The toolbar also provides restart, pause, engine sound, and control-help buttons.
+On phones and tablets, large touch controls appear while racing in portrait and landscape. Hold **GO** with one thumb and **Left/Right** with the other to accelerate and steer together; **Brake** and **Drift** are separate controls. Touch controls release when a finger lifts, touch is cancelled, the game pauses, or the page loses focus. The race view hides the surrounding panels to keep the road and controls together. The toolbar also provides restart, pause, engine sound, and control-help buttons.
 
 ## The garage
 
@@ -131,6 +133,8 @@ src/
   game.ts           Phaser scene, perspective rendering, driving, and opponents
   vehicles.ts       Car definitions, handling values, and saved selection
   daylight.ts       Sunset timing and transition progress
+  TouchControls.tsx Phone controls and pointer lifecycle
+  touch-input.ts    Multi-touch input tracking
   MusicPlayer.tsx   Looping soundtrack and music toggle
   style.css         Tailwind import and responsive styles
 public/

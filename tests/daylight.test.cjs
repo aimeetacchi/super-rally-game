@@ -91,3 +91,76 @@ test('restarting restores daylight and resets the driving clock', () => {
   assert.equal(game.elapsed, 0);
   assert.equal(sunsetProgress(game.drivingSeconds), 0);
 });
+
+const { TouchInput } = loadSource('touch-input');
+test('touch supports accelerating and steering with separate fingers', () => {
+  const game = scene();
+  game.control('start');
+  const input = new TouchInput((action, pressed) => game.setTouch(action, pressed));
+  input.press(1, 'UP');
+  advance(game, 1);
+  const previousX = game.playerX;
+  input.press(2, 'RIGHT');
+  advance(game, 1);
+  assert.ok(game.speed > 0);
+  assert.ok(game.playerX > previousX);
+  input.release(2);
+  assert.equal(game.touch.has('RIGHT'), false);
+  assert.equal(game.touch.has('UP'), true);
+});
+
+test('releasing one of two fingers on the same button keeps it held', () => {
+  const events = [];
+  const input = new TouchInput((action, pressed) => events.push([action, pressed]));
+  input.press(1, 'UP');
+  input.press(2, 'UP');
+  input.release(1);
+  assert.deepEqual(events, [['UP', true]]);
+  input.release(2);
+  assert.deepEqual(events, [
+    ['UP', true],
+    ['UP', false],
+  ]);
+});
+
+test('lost capture and repeated release cannot leave a control stuck', () => {
+  const game = scene();
+  game.control('start');
+  const input = new TouchInput((action, pressed) => game.setTouch(action, pressed));
+  input.press(1, 'UP');
+  input.press(2, 'SPACE');
+  input.release(1);
+  input.release(1);
+  assert.equal(game.touch.has('UP'), false);
+  assert.equal(game.touch.has('SPACE'), true);
+  input.clear();
+  assert.equal(game.touch.size, 0);
+  assert.equal(input.actions.size, 0);
+});
+
+test('pause clears held touch input and rejects new presses until resumed', () => {
+  const game = scene();
+  game.control('start');
+  game.setTouch('UP', true);
+  advance(game, 1);
+  game.control('pause');
+  assert.equal(game.touch.size, 0);
+  game.setTouch('UP', true);
+  assert.equal(game.touch.size, 0);
+  game.control('start');
+  const speed = game.speed;
+  advance(game, 1);
+  assert.ok(game.speed < speed);
+});
+
+test('moving a pointer between controls releases its previous action', () => {
+  const events = [];
+  const input = new TouchInput((action, pressed) => events.push([action, pressed]));
+  input.press(7, 'LEFT');
+  input.press(7, 'RIGHT');
+  assert.deepEqual(events, [
+    ['LEFT', true],
+    ['LEFT', false],
+    ['RIGHT', true],
+  ]);
+});

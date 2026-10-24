@@ -2025,3 +2025,138 @@ footer {
     max-width: 110px;
   }
 }
+/* Thumb controls remain visible on touch devices in both orientations. */
+.touch-controls {
+  display: none;
+  position: static;
+  width: 100%;
+  padding: 10px 12px 12px;
+  background: #101b2e;
+  border-top: 1px solid #324560;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+.touch-controls[hidden] {
+  display: none !important;
+}
+.touch-hint {
+  font-size: 9px;
+  color: #8ea8ce;
+  text-align: center;
+}
+.touch-pads {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+}
+.touch-group {
+  display: flex;
+  gap: 8px;
+}
+.touch-controls .touch-button {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  width: clamp(46px, 10vw, 76px);
+  height: 64px;
+  padding: 6px;
+  border: 1px solid #6684ae;
+  border-bottom-width: 4px;
+  border-radius: 9px;
+  background: #263e60;
+  color: #e7f0ff;
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+}
+.touch-button > span {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+.touch-controls .touch-up {
+  background: #296548;
+  color: #e5ffd5;
+  border-color: #71ae73;
+}
+.touch-controls .touch-down {
+  background: #643647;
+  color: #ffdae1;
+  border-color: #ad687b;
+}
+.touch-controls .touch-space {
+  background: #564b2c;
+  color: #fff0ae;
+  border-color: #a18c50;
+}
+.touch-controls .touch-button[data-held='true'] {
+  background: #d3e6ff;
+  color: #122344;
+  border-color: #9db9dc;
+  border-bottom-width: 1px;
+  transform: translateY(2px);
+}
+@media (any-pointer: coarse), (max-width: 900px) {
+  .touch-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+  }
+  .app-shell:is([data-race-status='racing'], [data-race-status='paused']) > header,
+  .app-shell:is([data-race-status='racing'], [data-race-status='paused']) .intro,
+  .app-shell:is([data-race-status='racing'], [data-race-status='paused']) aside,
+  .app-shell:is([data-race-status='racing'], [data-race-status='paused']) .controls-strip,
+  .app-shell:is([data-race-status='racing'], [data-race-status='paused']) > footer {
+    display: none;
+  }
+  .app-shell:is([data-race-status='racing'], [data-race-status='paused']) {
+    padding: 10px max(10px, env(safe-area-inset-left)) 10px max(10px, env(safe-area-inset-right));
+  }
+  .app-shell:is([data-race-status='racing'], [data-race-status='paused']) .rally-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .app-shell:is([data-race-status='racing'], [data-race-status='paused']) .game-viewport {
+    height: clamp(260px, calc(100svh - 260px), 640px);
+  }
+}
+@media (max-width: 360px) {
+  .touch-group {
+    gap: 5px;
+  }
+  .touch-pads {
+    gap: 6px;
+  }
+  .touch-controls {
+    padding-inline: 8px;
+  }
+}
+@media (orientation: landscape) and (max-height: 600px) and (any-pointer: coarse) {
+  .app-shell:is([data-race-status='racing'], [data-race-status='paused']) {
+    padding-block: 4px;
+  }
+  .app-shell:is([data-race-status='racing'], [data-race-status='paused']) .game-topbar {
+    display: none;
+  }
+  .app-shell:is([data-race-status='racing'], [data-race-status='paused']) .game-viewport {
+    height: max(170px, calc(100svh - 190px));
+  }
+  .touch-controls {
+    padding-block: 6px;
+    gap: 5px;
+  }
+  .touch-controls .touch-button {
+    height: 55px;
+  }
+  .game-toolbar {
+    height: 34px;
+  }
+  .soundtrack-bar {
+    padding-block: 7px;
+  }
+}

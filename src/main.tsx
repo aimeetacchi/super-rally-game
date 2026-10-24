@@ -1,12 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import Phaser from 'phaser';
 import {
   ArrowUpRight,
   ArrowRight,
-  ArrowUp,
-  ArrowDown,
-  ArrowLeft,
   Flag,
   Mountain,
   Volume2,
@@ -20,9 +17,10 @@ import {
   CircleHelp,
   X,
   Check,
-  Gauge,
 } from 'lucide-react';
 import { RallyScene, stages, type Telemetry } from './game';
+import { TouchControls } from './TouchControls';
+import type { TouchAction } from './touch-input';
 import './style.css';
 import { MusicPlayer } from './MusicPlayer';
 import { vehicles, loadVehicle, type RallyVehicle } from './vehicles';
@@ -152,6 +150,9 @@ function App() {
     [sound, setSound] = useState(false),
     [help, setHelp] = useState(false),
     [picker, setPicker] = useState(false);
+  const onTouchControl = useCallback((action: TouchAction, pressed: boolean) => {
+    scene.current?.setTouch(action, pressed);
+  }, []);
   const [data, setData] = useState<Telemetry>({
     speed: 0,
     time: 0,
@@ -182,9 +183,15 @@ function App() {
       render: { antialias: true },
       input: { keyboard: true },
     });
+    const resize = new ResizeObserver(() => {
+      if (holder.current)
+        game.scale.resize(holder.current.clientWidth, holder.current.clientHeight);
+    });
+    resize.observe(holder.current);
     setStatus('ready');
     setSound(false);
     return () => {
+      resize.disconnect();
       scene.current = null;
       game.destroy(true);
     };
@@ -260,7 +267,7 @@ function App() {
     return () => window.removeEventListener('keydown', handler);
   }, [status, help, changingCar]);
   return (
-    <div className="app-shell">
+    <div className="app-shell" data-race-status={status}>
       <header className="flex items-center justify-between">
         <a className="brand" href="#">
           <span className="brand-symbol">╱╱</span> SUPER RALLY<span className="brand-dot">®</span>
@@ -420,32 +427,12 @@ function App() {
                   </div>
                 </div>
               </div>
-              <div className="touch-controls">
-                {[
-                  ['LEFT', ArrowLeft],
-                  ['UP', ArrowUp],
-                  ['DOWN', ArrowDown],
-                  ['RIGHT', ArrowRight],
-                  ['SPACE', Gauge],
-                ].map(([key, Icon]) => {
-                  const Component = Icon as typeof ArrowUp;
-                  return (
-                    <button
-                      key={key as string}
-                      aria-label={key as string}
-                      onPointerDown={(e) => {
-                        e.currentTarget.setPointerCapture(e.pointerId);
-                        scene.current?.setTouch(key as string, true);
-                      }}
-                      onPointerUp={() => scene.current?.setTouch(key as string, false)}
-                      onPointerCancel={() => scene.current?.setTouch(key as string, false)}
-                    >
-                      <Component size={19} />
-                    </button>
-                  );
-                })}
-              </div>
             </div>
+            <TouchControls
+              visible={status === 'racing' || status === 'paused'}
+              enabled={status === 'racing' && !changingCar && !help}
+              onControl={onTouchControl}
+            />
             <div className="game-toolbar">
               <span>
                 <span className="keycap">↵</span> INSERT COIN? NAH. JUST DRIVE.
@@ -685,8 +672,9 @@ function App() {
               start your engines.
             </h2>
             <p>
-              Finish three laps before time runs out. Race seven rivals, stay on the asphalt, and
-              earn 25 bonus seconds each lap. Your best complete race is saved locally.
+              On phones, hold GO and steer with your other thumb. Brake and Drift also work with
+              touch. Finish three laps before time runs out. Race seven rivals, stay on the asphalt,
+              and earn 25 bonus seconds each lap. Your best complete race is saved locally.
             </p>
             <div className="help-row">
               <kbd>W / ↑</kbd>

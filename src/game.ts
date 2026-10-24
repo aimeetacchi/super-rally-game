@@ -516,7 +516,10 @@ export class RallyScene extends Phaser.Scene {
       this.active = true;
       this.paused = false;
     }
-    if (command === 'pause') this.paused = !this.paused;
+    if (command === 'pause') {
+      this.paused = !this.paused;
+      this.touch.clear();
+    }
     if (command === 'reset') {
       this.drivingSeconds = 0;
       this.active = false;
@@ -551,7 +554,7 @@ export class RallyScene extends Phaser.Scene {
     }
   }
   setTouch(key: string, pressed: boolean) {
-    if (pressed) this.touch.add(key);
+    if (pressed && this.active && !this.paused) this.touch.add(key);
     else this.touch.delete(key);
   }
   private emit() {
